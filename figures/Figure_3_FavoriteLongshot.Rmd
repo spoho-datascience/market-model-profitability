@@ -1,0 +1,177 @@
+---
+title: "Figure 3 - Favorite Longshot Bias"
+output: html_document
+last_update: "2025-09-03"
+---
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(plotrix)
+
+#IMPORT REAL DATA
+data <- read.csv(paste0(dirname(getwd()),'/data/data_real.csv'), sep = ";")
+
+
+#PREPROCESS DATA (ADD COLUMNS, CONVERT TO LONG FORMAT)
+# Ensure relevant variables are numeric
+data <- data %>% mutate(across(c(OddsHomeAvg, OddsDrawAvg, OddsAwayAvg, OddsHomeMax, OddsDrawMax, OddsAwayMax), as.numeric))
+
+#create indicator variables for home win / draw / away win
+data <- data %>%
+  mutate(homewin = ifelse(goalsHome > goalsAway, 1, 0),
+         awaywin = ifelse(goalsHome < goalsAway, 1, 0),
+         draw = ifelse(goalsHome == goalsAway, 1, 0))
+
+#create probabilities from odds (distinguishing between avg and max odds)
+data <- data %>%
+  mutate(invHomeMax = 1 / OddsHomeMax,
+         invAwayMax = 1 / OddsAwayMax,
+         invDrawMax = 1 / OddsDrawMax,
+         invSumMax = invHomeMax + invAwayMax + invDrawMax,
+         probHomeMax = invHomeMax / invSumMax,
+         probAwayMax = invAwayMax / invSumMax,
+         probDrawMax = invDrawMax / invSumMax,
+         payoffHomeMax = ifelse(homewin == 1, OddsHomeMax, 0),
+         payoffAwayMax = ifelse(awaywin == 1, OddsAwayMax, 0),
+         payoffDrawMax = ifelse(draw == 1, OddsDrawMax, 0),
+         invHomeAvg = 1 / OddsHomeAvg,
+         invAwayAvg = 1 / OddsAwayAvg,
+         invDrawAvg = 1 / OddsDrawAvg,
+         invSumAvg = invHomeAvg + invAwayAvg + invDrawAvg,
+         probHomeAvg = invHomeAvg / invSumAvg,
+         probAwayAvg = invAwayAvg / invSumAvg,
+         probDrawAvg = invDrawAvg / invSumAvg,
+         payoffHomeAvg = ifelse(homewin == 1, OddsHomeAvg, 0),
+         payoffAwayAvg = ifelse(awaywin == 1, OddsAwayAvg, 0),
+         payoffDrawAvg = ifelse(draw == 1, OddsDrawAvg, 0))
+
+
+# Reshape the data for probabilities into a "long" format 
+data_probs_long_max <- data %>%
+  select(probHomeMax, probAwayMax, probDrawMax) %>%
+  pivot_longer(cols = c(probHomeMax, probAwayMax, probDrawMax), names_to = "probs_type", values_to = "probs")
+
+data_probs_long_avg <- data %>%
+  select(probHomeAvg, probAwayAvg, probDrawAvg) %>%
+  pivot_longer(cols = c(probHomeAvg, probAwayAvg, probDrawAvg), names_to = "probs_type", values_to = "probs")
+
+# Reshape the data for payoffs into a "long" format
+data_payoffs_long_max <- data %>%
+  select(payoffHomeMax, payoffAwayMax, payoffDrawMax) %>%
+  pivot_longer(cols = c(payoffHomeMax, payoffAwayMax, payoffDrawMax), names_to = "payoff_type", values_to = "payoff")
+
+# Reshape the data for payoffs into a "long" format
+data_payoffs_long_avg <- data %>%
+  select(payoffHomeAvg, payoffAwayAvg, payoffDrawAvg) %>%
+  pivot_longer(cols = c(payoffHomeAvg, payoffAwayAvg, payoffDrawAvg), names_to = "payoff_type", values_to = "payoff")
+
+#combine payoff and probabilities data
+if(nrow(data_probs_long_max) == nrow(data_payoffs_long_max)){
+  data_long_max <- bind_cols(data_probs_long_max, data_payoffs_long_max %>% select(payoff))
+} else {
+  stop("Mismatch in the length of the reshaped dataframes for maximum odds.")
+}
+
+if(nrow(data_probs_long_avg) == nrow(data_payoffs_long_avg)){
+  data_long_avg <- bind_cols(data_probs_long_avg, data_payoffs_long_avg %>% select(payoff))
+} else {
+  stop("Mismatch in the length of the reshaped dataframes for average odds.")
+}
+
+
+#CALCULATE INFORMATION ON DECILES REQUIRED FOR THE FIGURE
+
+#calculate decile limits 
+data_deciles_max <- data_long_max %>%
+  mutate(decile_max = cut(probs, breaks = quantile(probs, seq(0, 1, length.out = 11), na.rm = TRUE), labels = FALSE))
+
+data_deciles_avg <- data_long_avg %>%
+  mutate(decile_avg = cut(probs, breaks = quantile(probs, seq(0, 1, length.out = 11), na.rm = TRUE), labels = FALSE))
+
+
+# Calculate average values and confidence intervals for payoffs and probabilities by deciles
+decile_summary_max <- data_deciles_max %>%
+  group_by(decile_max) %>%
+  summarise(
+    payoff_deciles_max = mean(payoff, na.rm = TRUE),
+    prob_deciles_max = mean(probs, na.rm = TRUE),
+    sd_payoff_deciles_max = sd(payoff, na.rm = TRUE),
+    n = n()
+  ) %>%
+  mutate(
+    se_payoff_deciles_max = sd_payoff_deciles_max / sqrt(n),
+    ci_lower_max = payoff_deciles_max - 1.96 * se_payoff_deciles_max,
+    ci_higher_max = payoff_deciles_max + 1.96 * se_payoff_deciles_max,
+  )
+
+decile_summary_avg <- data_deciles_avg %>%
+  group_by(decile_avg) %>%
+  summarise(
+    payoff_deciles_avg = mean(payoff, na.rm = TRUE),
+    prob_deciles_avg = mean(probs, na.rm = TRUE),
+    sd_payoff_deciles_avg = sd(payoff, na.rm = TRUE),
+    n = n()
+  ) %>%
+  mutate(
+    se_payoff_deciles_avg = sd_payoff_deciles_avg / sqrt(n),
+    ci_lower_avg = payoff_deciles_avg - 1.96 * se_payoff_deciles_avg,
+    ci_higher_avg = payoff_deciles_avg + 1.96 * se_payoff_deciles_avg,
+  )
+
+# Filter out rows where 'decile' is missing or blank
+decile_summary_max <- decile_summary_max %>% filter(!is.na(decile_max))
+decile_summary_avg <- decile_summary_avg %>% filter(!is.na(decile_avg))
+
+
+#calculate average payoffs across all bets
+mean_payoff_max <- mean(decile_summary_max$payoff_deciles_max, na.rm = TRUE)
+mean_payoff_avg <- mean(decile_summary_avg$payoff_deciles_avg, na.rm = TRUE)
+
+
+#CREATE AND SAVE FIGURE
+
+# create customised png file 
+png('Figure3.png', width = 750 , height = 525)
+par(mfrow = c(1, 1))
+
+#plot payoffs per decile for average odds
+plotCI(x = decile_summary_avg$prob_deciles_avg, 
+       y = decile_summary_avg$payoff_deciles_avg,
+       li = decile_summary_avg$ci_lower_avg,
+       ui = decile_summary_avg$ci_higher_avg,
+       ylim= c(0.7, 1.05),
+       xlab = "Probability Deciles",
+       ylab = "Average Payoff",
+       cex.lab = 1.5,
+       col = "blue")  
+
+abline(h = mean_payoff_avg, col = "blue", lty = "dashed")
+abline(h = 1, col = "red", lty = "dashed")
+lines(decile_summary_avg$prob_deciles_avg, decile_summary_avg$payoff_deciles_avg, col = "blue")
+
+#plot payoffs per decile for maximum odds in the same picture
+plotCI(x = decile_summary_max$prob_deciles_max, 
+       y = decile_summary_max$payoff_deciles_max,
+       li = decile_summary_max$ci_lower_max,
+       ui = decile_summary_max$ci_higher_max,
+       ylim = c(0.7, 1.05),
+       xlab = "Probability Deciles",
+       ylab = "Average Payoff",
+       cex.lab = 1.5,
+       add = TRUE,  
+       col = "green")  
+
+abline(h = mean_payoff_max, col = "green", lty = "dashed")
+abline(h = 1, col = "red", lty = "dashed")
+lines(decile_summary_max$prob_deciles_max, decile_summary_max$payoff_deciles_max, col = "green")
+
+# add legend
+legend("bottomright", legend = c("Average payoff of average odds across all bets","Average payoff of maximal odds across all bets", "Breakeven"),
+       col = c("blue", "green", "red"), lty = "dashed", cex = 1.5, bty = "n")  # bty = "n" removes box around legend
+
+# close png generation
+dev.off()
+```
+
+

@@ -1,0 +1,6 @@
+"0","############ Add excel file ##############"
+"0","library(readr)"
+"0","data <- read_delim(""data/data_Football_Economic_Paper_v3.csv"", "
+"0","    delim = "";"", escape_double = FALSE, trim_ws = TRUE)"
+"2","Fehler: 'data/data_Football_Economic_Paper_v3.csv' does not exist in current working directory ('C:/Users/Dell-PC/Documents/Projekte/market-model-profitability/figures').
+"
