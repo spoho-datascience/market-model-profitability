@@ -10,7 +10,7 @@ library(tidyr)
 library(plotrix)
 
 #IMPORT REAL DATA
-data <- read.csv(paste0(dirname(getwd()),'/data/data_real.csv'), sep = ";")
+data <- read.csv(paste0(dirname(getwd()),'/data/data_real_anonymised.csv'), sep = ";")
 
 
 #PREPROCESS DATA (ADD COLUMNS, CONVERT TO LONG FORMAT)
