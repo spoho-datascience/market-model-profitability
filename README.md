@@ -1,76 +1,233 @@
-**Replication package for the paper:**
+# Rating Systems and Betting Strategies
 
-**"Does the consideration of market prices in model selection increase model profitability? Evidence from theory, artificial data and real-world data." by Wunderlich, F., Garnica-Caparros, M., and Memmert, D. (2025)**
+**Replication package for:**
 
-## Overview & Folder Structure
+*"Does the consideration of market prices in model selection increase model profitability? Evidence from theory, artificial data and real-world data."*
 
-The code in this replication material generates the 4 figures (Fig 1 - Fig 4) present in the paper and can be used to obtain all information contained in the 4 relevant tables (Table 3 - Table 6) included in the paper.
+By Wunderlich, F., Garnica-Caparros, M., and Memmert, D. (2025)
 
-The main contents of the repository are the following:
+[![License](https://img.shields.io/badge/license-See%20Paper-blue)]()
+[![Python](https://img.shields.io/badge/python-3.7+-blue)](https://www.python.org/downloads/)
+[![Jupyter](https://img.shields.io/badge/jupyter-notebook-orange)](https://jupyter.org/)
 
--   `data/`: folder including ananonymised version of the real-world dataset
+## Overview
 
--   `figures/`: folder including R code to replicate Figures 1 - 4
+This replication package generates the 4 figures (Fig 1-4) and provides all information for the 4 tables (Table 3-6) from the paper.
 
--   `experiments/`: folder including code to rerun experiments on real-world and artificial data in Jupyter Notebook
+## Repository Structure
 
--   `results/`: folder where results of experimental runs are stored
+```
+├── data/          # Anonymized real-world dataset
+├── figures/       # R code to generate Figures 1-4
+├── experiments/   # Jupyter notebooks for experiments
+└── results/       # Experimental results storage
+```
 
-**Data**
+### Data
+- `data_real_anonymised.csv` - Anonymized dataset (team names and match dates) used for Figure 3 and real-world data results (Tables 5-6)
 
-This folder includes data_real_anonymised.csv, a dataset anonymised for team names and match dates, that is used as data source to generate Figure 3 and results with regard to real-world data (Table 5 and Table 6).
+### Figures
+- `Figure_3_FavoriteLongshot.Rmd` - Generates Figure 3
+- `Figures_124_OLR.Rmd` - Generates Figures 1, 2, and 4
+- Generated figures are saved in this directory
 
-**Figures**
+### Experiments
+- `EconomicExperimentRealData.ipynb` - Real-world data experiments
+- `EconomicExperimentArtificialData.ipynb` - Artificial data experiments
 
-Code used to generate the Figures can be found in the Rmd files Figure_3_FavoriteLongshot.Rmd for Figure 3 and Figures_124_OLR.Rmd for Figure 1, 2 and 4. The folder will also be used to store the generated figures.
+### Results
+Experimental results are automatically saved with descriptive filenames:
+- Format: `{data_type}_{result_type}_{betting_strategy}_{odds_type}.xlsx`
+- Example: `real_raw_fixed_averageodds.xlsx` = real data, raw results, fixed betting, average odds
 
-**Experiments**
+## Requirements
 
-This folder includes two .ipynb files that can be used to replicate results with regard to real-world data (EconomicExperimentRealData.ipynb) and artificial data EconomicExperimentArtificialData.ipynb.
+- **Python**: 3.7+ (tested with 3.7)
+- **R**: For figure generation (Rmd files)
+- **Dependencies**: Listed in `requirements.txt` and `pyproject.toml`
 
-**Results**
+## Environment Setup
 
-Results for the experimental runs are automatically stored in this folder. The name of the results include information on whether it used real or artificial data, whether it displays raw results or result tables and which run the results refer to. For example real_raw_fixed_averageodds.xlsx illustrates raw results from real data for a run with fixed betting on average odds.
+This project supports two Python environment management approaches:
 
-## Required steps for replication of the paper results
+### Option 1: Using uv (Recommended)
 
-**Figures 1 to 4** Running of the .Rmd files in R will lead to a generation and storage of Fig1 to Fig4 from the manuscript. No further steps are needed.
+[uv](https://github.com/astral-sh/uv) is a fast Python package installer and resolver.
 
-**Tables 3 - 6**
+1. **Install uv:**
+   ```bash
+   # macOS/Linux
+   curl -LsSf https://astral.sh/uv/install.sh | sh
 
-Results of the Tables can be replicated using the Python code. Performing the runs does not require any specific computational power, but might require several minutes up to more than an hour per experimental run. Full replication of all results in Table 3 - Table 6 requires three experimental runs on artificial data and six experimental runs on real data. Results of Table 3 and 5 (just involving one experimental run each, can be directly replicated as one results file). Results of Table 4 and 6 need to be gathered from the results of several distinct experimental runs and thus cannot be replicated as one single results file. The information for Table 4 (Table 6) can be found in 12 (6) result files as specified below.
+   # Windows
+   powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+   ```
 
-**Table 3**
+2. **Setup environment:**
+   ```bash
+   # Create virtual environment
+   uv venv --python 3.7
 
--   Use EconomicExperimentArtificialData.ipynb
--   Make sure to use the right specification (config = experimentFL)
--   Run the full code
--   The results of Table 3 have been stored in /results/artificial_table_ExperimentFL_Fixed_bm2.xlsx
+   # Activate environment
+   source .venv/bin/activate  # macOS/Linux
+   .venv\Scripts\activate     # Windows
 
-**Table 4**
+   # Install dependencies
+   uv pip install -e .
+   ```
 
--   Use EconomicExperimentArtificialData.ipynb
--   Replication requires three (i.e. two additional) experimental runs with specifications "config = experimentFL" as in Table 3, plus additionally "config = experimentHA" and "config = experimentDraw"
--   Run the full code for each of the specifications
--   The information required for Table 4 can be gathered from 12 result tables across all experimental runs
+### Option 2: Using pip + venv
 
-Favourite-Longshot Fixed 10% -\> artificial_table_ExperimentFL_Fixed_bm2 Favourite-Longshot Fixed 0% -\> artificial_table_ExperimentFL_Fixed_bm1 Favourite-Longshot Kelly 10% -\> artificial_table_ExperimentFL_Kelly_bm2 Favourite-Longshot Kelly 0% -\> artificial_table_ExperimentFL_Kelly_bm1 Home Advantage Fixed 10% -\> artificial_table_ExperimentHA_Fixed_bm2 Home Advantage Fixed 0% -\> artificial_table_ExperimentHA_Fixed_bm1 Home Advantage Kelly 10% -\> artificial_table_ExperimentHA_Kelly_bm2 Home Advantage Kelly 0% -\> artificial_table_ExperimentHA_Kelly_bm1 Draw Fixed 10% -\> artificial_table_ExperimentDraw_Fixed_bm2 Draw Fixed 0% -\> artificial_table_ExperimentDraw_Fixed_bm1 Draw Kelly 10% -\> artificial_table_ExperimentDraw_Kelly_bm2 Draw Kelly 0% -\> artificial_table_ExperimentDraw_Kelly_bm1
+1. **Create virtual environment:**
+   ```bash
+   python3.7 -m venv venv
 
-**Table 5**
+   # Activate environment
+   source venv/bin/activate  # macOS/Linux
+   venv\Scripts\activate     # Windows
+   ```
 
--   Use EconomicExperimentRealData.ipynb
--   Make sure to use the right specification -- betting = FixedBetting(100) -- betting_description = 'fixed' -- odds_type = 'averageodds'
--   Run the full code
--   The results of Table 5 have been stored in /results/real_table_fixed_averageodds.xlsx. Moreover, the table includes the confidence interval reported in the text in relation to Table 5.
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-**Table 6**
+## Usage
 
--   Use EconomicExperimentRealData.ipynb
+### Running Experiments
 
--   Replication requires six (i.e. five additional) experimental runs with the following specifications: betting = FixedBetting(100) -- betting_description = 'fixed' -- odds_type = 'averageodds' as from Table 3, plus additionally betting = ThresholdBetting(0.2) -- betting_description = 'threshold' -- odds_type = 'averageodds' betting = KellyBetting(100) -- betting_description = 'kelly' -- odds_type = 'averageodds' betting = FixedBetting(100) -- betting_description = 'fixed' -- odds_type = 'maximumodds' betting = ThresholdBetting(0.3) -- betting_description = 'threshold' -- odds_type = 'maximumodds' betting = KellyBetting(100) -- betting_description = 'kelly' -- odds_type = 'maximumodds'
+1. **Start Jupyter:**
+   ```bash
+   jupyter notebook
+   ```
 
--   Run the full code for each of the specifications
+2. **Open notebooks:**
+   - `EconomicExperimentRealData.ipynb` - Real data experiments
+   - `EconomicExperimentArtificialData.ipynb` - Artificial data experiments
 
--   The information required for Table 6 can be gathered from six result tables across all experimental runs
+## Key Dependencies
 
-Average Fixed -\> real_table_fixed_averageodds.xlsx Average Threshold(20%) -\> real_table_threshold_averageodds.xlsx Average Kelly -\> real_table_kelly_averageodds.xlsx Maximum Fixed -\> real_table_fixed_maximumodds.xlsx Maximum Threshold(30%) -\> real_table_threshold_maximumodds.xlsx Maximum Kelly - real_table_kelly_maximumodds.xlsx
+| Package | Version | Purpose |
+|---------|---------|----------|
+| pandas | >=1.1.0, <1.4.0 | Data manipulation |
+| numpy | >=1.16.0, <1.22.0 | Numerical computing |
+| tqdm | >=4.50.0, <5.0.0 | Progress bars |
+| jupyter | >=1.0.0 | Notebook environment |
+| openpyxl | >=3.0.0, <4.0.0 | Excel export |
+| dfg_rating | - | Rating system (install separately) |
+
+> **Note:** The `dfg_rating` package must be installed separately.
+
+## Citation
+
+If you use this code or data in your research, please cite:
+
+```bibtex
+@article{wunderlich2025rating,
+  title={Does the consideration of market prices in model selection increase model profitability? Evidence from theory, artificial data and real-world data},
+  author={Wunderlich, F. and Garnica-Caparros, M. and Memmert, D.},
+  year={2025}
+}
+```
+
+## Replication Instructions
+
+### Figures 1-4
+Run the R Markdown files in R to generate and save figures:
+- No additional steps required
+- Figures saved automatically to `/figures/`
+
+### Tables 3-6
+**Runtime:** Several minutes to >1 hour per experimental run
+**Requirements:**
+- Table 3 & 5: 1 run each (direct replication)
+- Table 4 & 6: Multiple runs required (results gathered from multiple files)
+
+**Total runs needed:**
+- Artificial data: 3 experimental runs
+- Real data: 6 experimental runs
+
+### Table 3 (Artificial Data)
+1. Open `EconomicExperimentArtificialData.ipynb`
+2. Set configuration: `config = experimentFL`
+3. Run complete notebook
+4. **Result:** `artificial_table_ExperimentFL_Fixed_bm2.xlsx`
+
+### Table 4 (Artificial Data)
+Requires 3 experimental runs with different configurations:
+
+1. **Run 1:** `config = experimentFL` (same as Table 3)
+2. **Run 2:** `config = experimentHA`
+3. **Run 3:** `config = experimentDraw`
+
+**Result files mapping:**
+| Strategy | Fixed 10% | Fixed 0% | Kelly 10% | Kelly 0% |
+|----------|-----------|----------|-----------|----------|
+| Favourite-Longshot | ExperimentFL_Fixed_bm2 | ExperimentFL_Fixed_bm1 | ExperimentFL_Kelly_bm2 | ExperimentFL_Kelly_bm1 |
+| Home Advantage | ExperimentHA_Fixed_bm2 | ExperimentHA_Fixed_bm1 | ExperimentHA_Kelly_bm2 | ExperimentHA_Kelly_bm1 |
+| Draw | ExperimentDraw_Fixed_bm2 | ExperimentDraw_Fixed_bm1 | ExperimentDraw_Kelly_bm2 | ExperimentDraw_Kelly_bm1 |
+
+### Table 5 (Real Data)
+1. Open `EconomicExperimentRealData.ipynb`
+2. Set parameters:
+   ```python
+   betting = FixedBetting(100)
+   betting_description = 'fixed'
+   odds_type = 'averageodds'
+   ```
+3. Run complete notebook
+4. **Result:** `real_table_fixed_averageodds.xlsx` (includes confidence intervals)
+
+### Table 6 (Real Data)
+Requires 6 experimental runs with different betting/odds combinations:
+
+| Odds Type | Fixed | Threshold | Kelly |
+|-----------|-------|-----------|-------|
+| **Average** | FixedBetting(100) | ThresholdBetting(0.2) | KellyBetting(100) |
+| **Maximum** | FixedBetting(100) | ThresholdBetting(0.3) | KellyBetting(100) |
+
+**Result files:**
+- `real_table_fixed_averageodds.xlsx`
+- `real_table_threshold_averageodds.xlsx`
+- `real_table_kelly_averageodds.xlsx`
+- `real_table_fixed_maximumodds.xlsx`
+- `real_table_threshold_maximumodds.xlsx`
+- `real_table_kelly_maximumodds.xlsx`
+
+## Troubleshooting
+
+### Common Issues
+
+**Environment Setup:**
+- Ensure Python 3.7+ is installed
+- Try creating a fresh virtual environment if packages conflict
+- On Windows, use appropriate activation script (.bat vs .ps1)
+
+**Missing Dependencies:**
+```bash
+# If dfg_rating is missing, install separately:
+pip install dfg_rating
+```
+
+**Jupyter Issues:**
+```bash
+# Register kernel with environment
+python -m ipykernel install --user --name=economic_paper
+```
+
+**Long Runtime:**
+- Experimental runs may take >1 hour
+- Consider running overnight for complete replication
+- Monitor progress bars in notebooks
+
+## Contributing
+
+This is a replication package for a published paper. For questions or issues:
+
+1. Check existing issues in the repository
+2. Create a new issue with detailed description
+3. Include system information and error messages
+
+## License
+
+This project is released under the terms specified by the authors. Please see the paper for usage rights and restrictions.
