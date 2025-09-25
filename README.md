@@ -114,9 +114,9 @@ This project supports two Python environment management approaches:
 | tqdm | >=4.50.0, <5.0.0 | Progress bars |
 | jupyter | >=1.0.0 | Notebook environment |
 | openpyxl | >=3.0.0, <4.0.0 | Excel export |
-| dfg_rating | - | Rating system (install separately) |
+| dfg_rating | - | Simulation framework |
 
-> **Note:** The `dfg_rating` package must be installed separately.
+> **Note:** The `dfg_rating` package must be installed from [GitHub](https://github.com/spoho-datascience/dfg-rating).
 
 ## Citation
 
@@ -205,8 +205,8 @@ Requires 6 experimental runs with different betting/odds combinations:
 
 **Missing Dependencies:**
 ```bash
-# If dfg_rating is missing, install separately:
-pip install dfg_rating
+# If dfg_rating is missing, install from GitHub:
+pip install git+https://github.com/spoho-datascience/dfg-rating.git
 ```
 
 **Jupyter Issues:**
