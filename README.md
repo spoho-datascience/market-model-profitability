@@ -39,6 +39,7 @@ This replication package generates the 4 figures (Fig 1-4) and provides all info
 Experimental results are automatically saved with descriptive filenames:
 - Format: `{data_type}_{result_type}_{betting_strategy}_{odds_type}.xlsx`
 - Example: `real_raw_fixed_averageodds.xlsx` = real data, raw results, fixed betting, average odds
+The folder contains all result files from the runs presented in the paper. Rerunning will lead to an automatic reproduction of these result files.
 
 ## Requirements
 
@@ -138,7 +139,7 @@ Run the R Markdown files in R to generate and save figures:
 - Figures saved automatically to `/figures/`
 
 ### Tables 3-6
-**Runtime:** Several minutes to >1 hour per experimental run
+**Runtime:** Several minutes (Table 5 & 6) to >1 hour (Table 3 & 4) per experimental run
 **Requirements:**
 - Table 3 & 5: 1 run each (direct replication)
 - Table 4 & 6: Multiple runs required (results gathered from multiple files)
@@ -216,8 +217,10 @@ python -m ipykernel install --user --name=economic_paper
 ```
 
 **Long Runtime:**
-- Experimental runs may take >1 hour
-- Consider running overnight for complete replication
+- Due to the number of model iterations per run and the number of different runs for full result reproduction, running time may be important to consider 
+- Orignial runs on real-world data needed ~20 mins each on a laptop with 16 GB RAM
+- Original runs on artificial data needed ~ 2 hours each on a laptop with 16 GB RAM
+- Consider running overnight for complete reproduction
 - Monitor progress bars in notebooks
 
 ## Contributing
